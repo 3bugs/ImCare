@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <color name="colorPrimary">#239e55</color>
+    <color name="colorPrimaryDark">#256c1c</color>
+    <color name="primary_text">#0b8a3d</color>
+    <color name="background">#b4edcd</color>
+    <color name="background_title">#cffae7</color>
+    <color name="foreground_select">#30239e55</color>
+    <color name="background_edit_text">#ffffff</color>
+    <color name="border_edit_text">#d2d5d3</color>
+    <color name="colorAccent">@color/colorPrimaryDark</color>
+    <!--<color name="background_material_light"
+           tools:override="true">@color/background
+    </color>-->
+</resources>
