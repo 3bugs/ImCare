@@ -83,4 +83,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/date_edit_text"/>
 
+    <Button
+        android:id="@+id/view_graph_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:padding="2dp"
+        android:text="เปรียบเทียบ"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="@+id/title_text_view"
+        app:layout_constraintTop_toTopOf="parent"/>
+
 </android.support.constraint.ConstraintLayout>

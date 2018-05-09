@@ -28,7 +28,8 @@ import static com.example.imcare.etc.Const.HEALTH_RECORD_CATEGORY_SYSTEM;
 import static com.example.imcare.etc.Const.HEALTH_RECORD_CATEGORY_UNDEFINED;
 import static com.example.imcare.etc.Const.HEALTH_RECORD_VALUE_EMPTY;
 
-public class HealthRecordListAdapter extends RecyclerView.Adapter<HealthRecordListAdapter.GenericViewHolder> {
+public class HealthRecordListAdapter extends
+        RecyclerView.Adapter<HealthRecordListAdapter.GenericViewHolder> {
 
     private static final int VIEW_TYPE_NORMAL = 0;
     private static final int VIEW_TYPE_HEADER = 1;

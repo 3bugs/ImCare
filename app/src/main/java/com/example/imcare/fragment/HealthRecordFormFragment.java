@@ -2,7 +2,6 @@ package com.example.imcare.fragment;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -77,6 +77,16 @@ public class HealthRecordFormFragment extends Fragment implements View.OnClickLi
                     }
                 });
         recyclerView.setAdapter(mAdapter);
+
+        Button viewGraphButton = view.findViewById(R.id.view_graph_button);
+        viewGraphButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mListener != null) {
+                    mListener.onViewGraphButtonClicked(mCalendar.getTime());
+                }
+            }
+        });
     }
 
     @Override
@@ -166,6 +176,6 @@ public class HealthRecordFormFragment extends Fragment implements View.OnClickLi
     }
 
     public interface HealthRecordFormListener {
-        void onFragmentInteraction(Uri uri);
+        void onViewGraphButtonClicked(Date date);
     }
 }

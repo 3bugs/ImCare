@@ -11,7 +11,10 @@ import android.widget.ImageView;
 import com.example.imcare.fragment.CheckupGuideFormFragment;
 import com.example.imcare.fragment.CheckupGuideResultFragment;
 import com.example.imcare.fragment.HealthRecordFormFragment;
+import com.example.imcare.fragment.HealthRecordGraphFragment;
 import com.example.imcare.fragment.ProfileDataFragment;
+
+import java.util.Date;
 
 import static com.example.imcare.etc.Const.CHECKUP_GUIDE;
 import static com.example.imcare.etc.Const.HEALTH_RECORD;
@@ -21,7 +24,8 @@ public class MainActivity extends AppCompatActivity implements
         View.OnClickListener,
         CheckupGuideFormFragment.CheckupGuideFormFragmentListener,
         HealthRecordFormFragment.HealthRecordFormListener,
-        ProfileDataFragment.ProfileDataFragmentListener {
+        ProfileDataFragment.ProfileDataFragmentListener,
+        HealthRecordGraphFragment.HealthRecordGraphFragmentListener {
 
     ImageView mCheckupGuideImageView, mHealthRecordImageView, mProfileDataImageView;
 
@@ -108,16 +112,25 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
-
-    @Override
     public void onSubmitCheckupGuideForm(int age, int sex) {
         Fragment fragment = CheckupGuideResultFragment.newInstance(age, sex);
         getSupportFragmentManager().beginTransaction().replace(
                 R.id.fragment_container,
                 fragment
         ).addToBackStack(null).commit();
+    }
+
+    @Override
+    public void onViewGraphButtonClicked(Date date) {
+        Fragment fragment = HealthRecordGraphFragment.newInstance(date);
+        getSupportFragmentManager().beginTransaction().replace(
+                R.id.fragment_container,
+                fragment
+        ).addToBackStack(null).commit();
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 }
