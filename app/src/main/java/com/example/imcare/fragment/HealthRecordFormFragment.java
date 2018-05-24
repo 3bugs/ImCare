@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -30,7 +29,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class HealthRecordFormFragment extends Fragment implements View.OnClickListener {
+public class HealthRecordFormFragment extends BaseFragment implements View.OnClickListener {
 
     private HealthRecordFormListener mListener;
 
@@ -41,6 +40,7 @@ public class HealthRecordFormFragment extends Fragment implements View.OnClickLi
 
     public HealthRecordFormFragment() {
         // Required empty public constructor
+        setTitle("บันทึกผลการตรวจสุขภาพ");
     }
 
     @Override

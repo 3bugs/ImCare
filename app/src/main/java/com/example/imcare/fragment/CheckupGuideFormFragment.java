@@ -5,7 +5,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +21,7 @@ import static com.example.imcare.etc.Const.SEX_FEMALE;
 import static com.example.imcare.etc.Const.SEX_MALE;
 import static com.example.imcare.etc.Const.SEX_UNDEFINED;
 
-public class CheckupGuideFormFragment extends Fragment implements View.OnClickListener {
+public class CheckupGuideFormFragment extends BaseFragment implements View.OnClickListener {
 
     private static final String KEY_AGE = "age";
     private static final String KEY_SEX = "sex";
@@ -35,6 +34,7 @@ public class CheckupGuideFormFragment extends Fragment implements View.OnClickLi
 
     public CheckupGuideFormFragment() {
         // Required empty public constructor
+        setTitle("โปรแกรมการตรวจสุขภาพ\nที่เหมาะสมกับแต่ละบุคคล");
     }
 
     @Override

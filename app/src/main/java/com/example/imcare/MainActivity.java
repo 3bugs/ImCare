@@ -2,9 +2,12 @@ package com.example.imcare;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -34,6 +37,8 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        setupToolbar();
+
         mCheckupGuideImageView = findViewById(R.id.checkup_guide_image_view);
         mHealthRecordImageView = findViewById(R.id.health_record_image_view);
         mProfileDataImageView = findViewById(R.id.profile_data_image_view);
@@ -42,7 +47,21 @@ public class MainActivity extends AppCompatActivity implements
         mHealthRecordImageView.setOnClickListener(this);
         mProfileDataImageView.setOnClickListener(this);
 
-        loadFragment(CHECKUP_GUIDE);
+        loadFragment(HEALTH_RECORD);
+    }
+
+    private void setupToolbar() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
     }
 
     @Override
@@ -94,19 +113,19 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void updateBottomNavImage(int type) {
-        mCheckupGuideImageView.setImageResource(R.drawable.ic_checkup_guide_normal);
-        mHealthRecordImageView.setImageResource(R.drawable.ic_health_record_normal);
-        mProfileDataImageView.setImageResource(R.drawable.ic_profile_data_normal);
+        mCheckupGuideImageView.setImageResource(R.drawable.ic_checkup_guide_off);
+        mHealthRecordImageView.setImageResource(R.drawable.ic_health_record_off);
+        mProfileDataImageView.setImageResource(R.drawable.ic_profile_data_off);
 
         switch (type) {
             case CHECKUP_GUIDE:
-                mCheckupGuideImageView.setImageResource(R.drawable.ic_checkup_guide_pressed);
+                mCheckupGuideImageView.setImageResource(R.drawable.ic_checkup_guide_on);
                 break;
             case HEALTH_RECORD:
-                mHealthRecordImageView.setImageResource(R.drawable.ic_health_record_pressed);
+                mHealthRecordImageView.setImageResource(R.drawable.ic_health_record_on);
                 break;
             case PROFILE_DATA:
-                mProfileDataImageView.setImageResource(R.drawable.ic_profile_data_pressed);
+                mProfileDataImageView.setImageResource(R.drawable.ic_profile_data_on);
                 break;
         }
     }

@@ -5,7 +5,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -22,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class HealthRecordGraphFragment extends Fragment {
+public class HealthRecordGraphFragment extends BaseFragment {
 
     private static final String TAG = HealthRecordGraphFragment.class.getName();
     private static final String ARG_DATE = "date";
@@ -34,6 +33,7 @@ public class HealthRecordGraphFragment extends Fragment {
 
     public HealthRecordGraphFragment() {
         // Required empty public constructor
+        setTitle("เปรียบเทียบผลการตรวจสุขภาพ");
     }
 
     public static HealthRecordGraphFragment newInstance(Date date) {

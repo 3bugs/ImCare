@@ -7,19 +7,19 @@
     <item
         android:id="@+id/action_checkup_guide"
         android:enabled="true"
-        android:icon="@drawable/ic_checkup_guide_normal"
+        android:icon="@drawable/ic_checkup_guide_off"
         android:title="โปรแกรมการตรวจสุบภาพ"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/action_health_record"
         android:enabled="true"
-        android:icon="@drawable/ic_health_record_normal"
+        android:icon="@drawable/ic_health_record_off"
         android:title="บันทึกผลการตรวจสุบภาพ"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/action_profile_data"
         android:enabled="true"
-        android:icon="@drawable/ic_profile_data_normal"
+        android:icon="@drawable/ic_profile_data_off"
         android:title="ข้อมูลของฉัน"
         app:showAsAction="ifRoom"/>
 

@@ -3,7 +3,6 @@ package com.example.imcare.fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +19,7 @@ import java.util.Locale;
 
 import static com.example.imcare.etc.Const.SEX_MALE;
 
-public class CheckupGuideResultFragment extends Fragment {
+public class CheckupGuideResultFragment extends BaseFragment {
 
     private static final String ARG_AGE = "age";
     private static final String ARG_SEX = "sex";
@@ -32,6 +31,7 @@ public class CheckupGuideResultFragment extends Fragment {
 
     public CheckupGuideResultFragment() {
         // Required empty public constructor
+        setTitle("โปรแกรมการตรวจสุขภาพ\nที่เหมาะสมกับคุณ");
     }
 
     public static CheckupGuideResultFragment newInstance(int age, int sex) {
