@@ -8,7 +8,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.example.imcare.etc.MyDateFormatter;
+import com.example.imcare.model.HealthRecord;
 import com.example.imcare.model.HealthRecordItem;
+import com.example.imcare.model.Profile;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,7 +20,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static com.example.imcare.etc.Const.HEALTH_RECORD_CATEGORY_BODY;
-import static com.example.imcare.etc.Const.HEALTH_RECORD_CATEGORY_FAT_GLOCOSE;
+import static com.example.imcare.etc.Const.HEALTH_RECORD_CATEGORY_FAT_GLUCOSE;
 import static com.example.imcare.etc.Const.HEALTH_RECORD_CATEGORY_HEART_BLOOD;
 import static com.example.imcare.etc.Const.HEALTH_RECORD_CATEGORY_SYSTEM;
 import static com.example.imcare.etc.Const.HEALTH_RECORD_VALUE_EMPTY;
@@ -30,7 +33,7 @@ public class CareDb {
     public static final String STORED_DATE_FORMAT = "yyyy-MM-dd";
 
     private static final String DATABASE_NAME = "care.db";
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 10;
 
     // เทเบิล checkup_guide
     // +-----+-------+-----+---------+---------+
@@ -79,23 +82,56 @@ public class CareDb {
                     + ")";
 
     // เทเบิล health_record
-    // +-----------+------+-------+
-    // | lookup_id | date | value |
-    // +-----------+------+-------+
-    // |           |      |       |
+    // +-----+------+-------+--------+
+    // | _id | date | place | doctor |
+    // +-----+------+-------+--------+
+    // |     |      |       |        |
 
     private static final String TABLE_HEALTH_RECORD = "health_record";
-    private static final String COL_LOOKUP_ID = "lookup_id";
     private static final String COL_DATE = "date";
-    private static final String COL_VALUE = "value";
+    private static final String COL_PLACE = "place";
+    private static final String COL_DOCTOR = "doctor";
 
     private static final String SQL_CREATE_TABLE_HEALTH_RECORD =
             "CREATE TABlE " + TABLE_HEALTH_RECORD + "("
-                    /*+ COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "*/
-                    + COL_LOOKUP_ID + " INTEGER, "
+                    + COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                     + COL_DATE + " TEXT, "
+                    + COL_PLACE + " TEXT, "
+                    + COL_DOCTOR + " TEXT "
+                    + ")";
+
+    // เทเบิล health_record_details
+    // +-----------+-----------+-------+
+    // | record_id | lookup_id | value |
+    // +-----------+-----------+-------+
+    // |           |           |       |
+
+    private static final String TABLE_HEALTH_RECORD_DETAILS = "health_record_details";
+    private static final String COL_RECORD_ID = "record_id";
+    private static final String COL_LOOKUP_ID = "lookup_id";
+    private static final String COL_VALUE = "value";
+
+    private static final String SQL_CREATE_TABLE_HEALTH_RECORD_DETAILS =
+            "CREATE TABlE " + TABLE_HEALTH_RECORD_DETAILS + "("
+                    + COL_RECORD_ID + " INTEGER, "
+                    + COL_LOOKUP_ID + " INTEGER, "
                     + COL_VALUE + " REAL, "
-                    + " PRIMARY KEY (" + COL_LOOKUP_ID + ", " + COL_DATE + ")"
+                    + " PRIMARY KEY (" + COL_RECORD_ID + ", " + COL_LOOKUP_ID + ")"
+                    + ")";
+
+    // เทเบิล profile
+    // +------------+-----+
+    // | birth_date | sex |
+    // +------------+-----+
+    // |            |     |
+
+    private static final String TABLE_PROFILE = "profile";
+    private static final String COL_BIRTH_DATE = "birth_date";
+
+    private static final String SQL_CREATE_TABLE_PROFILE =
+            "CREATE TABlE " + TABLE_PROFILE + "("
+                    + COL_BIRTH_DATE + " TEXT, "
+                    + COL_SEX + " INTEGER " // SEX_MALE, SEX_FEMALE
                     + ")";
 
     private static DatabaseHelper sDbHelper;
@@ -109,6 +145,39 @@ public class CareDb {
             sDbHelper = new DatabaseHelper(context);
         }
         mDatabase = sDbHelper.getWritableDatabase();
+    }
+
+    public void setProfile(Date birthDate, int sex) {
+        mDatabase.delete(TABLE_PROFILE, null, null);
+
+        ContentValues cv = new ContentValues();
+        cv.put(COL_BIRTH_DATE, new MyDateFormatter().format(birthDate));
+        cv.put(COL_SEX, sex);
+        mDatabase.insert(TABLE_PROFILE, null, cv);
+    }
+
+    public Profile getProfile() {
+        Cursor cursor = mDatabase.query(
+                TABLE_PROFILE,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        Profile profile;
+        if (cursor.getCount() == 0) {
+            profile = null;
+        } else {
+            cursor.moveToFirst();
+            profile = new Profile(
+                    new MyDateFormatter().parse(cursor.getString(cursor.getColumnIndex(COL_BIRTH_DATE))),
+                    cursor.getInt(cursor.getColumnIndex(COL_SEX))
+            );
+        }
+        return profile;
     }
 
     public List<String> getCheckupListByAgeAndSex(int age, int sex) {
@@ -141,7 +210,50 @@ public class CareDb {
         return checkupList;
     }
 
-    public List<HealthRecordItem> getHealthRecordItemListByDate(Date date) {
+    public List<HealthRecordItem> getHealthRecordItemListByDateAndCategory(Date date, int category) {
+        List<HealthRecordItem> healthRecordItemList = new ArrayList<>();
+
+        final String LOOKUP_ID = "lookup_id";
+        String dateString = new MyDateFormatter().format(date);
+
+        String sql = "SELECT " + " l." + COL_ID + " AS " + LOOKUP_ID
+                + ", l." + COL_TITLE + ", l." + COL_NAME + ", l." + COL_UNIT
+                + ", l." + COL_MIN_VALUE + ", l." + COL_MAX_VALUE + ", l." + COL_CATEGORY
+                + ", r." + COL_VALUE
+                + " FROM health_record_lookup l LEFT JOIN "
+                + " (SELECT hrd.lookup_id, hrd.value FROM health_record hr INNER JOIN health_record_details hrd ON hr._id = hrd.record_id AND hr.date='" + dateString + "') AS r "
+                + " ON l." + COL_ID + "=" + " r." + COL_LOOKUP_ID
+                + " WHERE " + COL_CATEGORY + "=?";
+
+        Cursor cursor = mDatabase.rawQuery(sql, new String[]{String.valueOf(category)});
+
+        while (cursor.moveToNext()) {
+            int id = cursor.getInt(cursor.getColumnIndex(LOOKUP_ID));
+            String title = cursor.getString(cursor.getColumnIndex(COL_TITLE));
+            String name = cursor.getString(cursor.getColumnIndex(COL_NAME));
+            String unit = cursor.getString(cursor.getColumnIndex(COL_UNIT));
+            float minValue = cursor.getFloat(cursor.getColumnIndex(COL_MIN_VALUE));
+            float maxValue = cursor.getFloat(cursor.getColumnIndex(COL_MAX_VALUE));
+            int cat = cursor.getInt(cursor.getColumnIndex(COL_CATEGORY));
+
+            float value = HEALTH_RECORD_VALUE_EMPTY;
+            int valueColumnIndex = cursor.getColumnIndex(COL_VALUE);
+            if (!cursor.isNull(valueColumnIndex)) {
+                value = cursor.getFloat(valueColumnIndex);
+            }
+
+            healthRecordItemList.add(
+                    new HealthRecordItem(
+                            id, title, name, unit, value,
+                            minValue, maxValue, cat/*, recordId*/
+                    )
+            );
+        }
+        cursor.close();
+        return healthRecordItemList;
+    }
+
+    /*public List<HealthRecordItem> getHealthRecordItemListByDate(Date date) {
         List<HealthRecordItem> healthRecordItemList = new ArrayList<>();
 
         final String LOOKUP_ID = "lookup_id";
@@ -149,7 +261,7 @@ public class CareDb {
         String sql = "SELECT " + " l." + COL_ID + " AS " + LOOKUP_ID
                 + ", l." + COL_TITLE + ", l." + COL_NAME + ", l." + COL_UNIT
                 + ", l." + COL_MIN_VALUE + ", l." + COL_MAX_VALUE + ", l." + COL_CATEGORY
-                /*+ ", r." + COL_ID + " AS " + RECORD_ID*/
+                *//*+ ", r." + COL_ID + " AS " + RECORD_ID*//*
                 + ", r." + COL_DATE + ", r." + COL_VALUE
                 + " FROM "
                 + TABLE_HEALTH_RECORD_LOOKUP + " l LEFT JOIN " + TABLE_HEALTH_RECORD + " r "
@@ -175,22 +287,22 @@ public class CareDb {
                 value = cursor.getFloat(valueColumnIndex);
             }
 
-            /*int recordId = 0;
+            *//*int recordId = 0;
             int recordIdColumnIndex = cursor.getColumnIndex(RECORD_ID);
             if (!cursor.isNull(recordIdColumnIndex)) {
                 recordId = cursor.getInt(recordIdColumnIndex);
-            }*/
+            }*//*
 
             healthRecordItemList.add(
                     new HealthRecordItem(
                             id, title, name, unit, value,
-                            minValue, maxValue, category/*, recordId*/
+                            minValue, maxValue, category*//*, recordId*//*
                     )
             );
         }
         cursor.close();
         return healthRecordItemList;
-    }
+    }*/
 
     public boolean saveHealthRecord(HealthRecordItem healthRecordItem, Date date) {
         SimpleDateFormat formatter = new SimpleDateFormat(STORED_DATE_FORMAT, Locale.US);
@@ -215,19 +327,91 @@ public class CareDb {
         }
     }
 
+    public boolean saveHealthRecordItem(long recordId, HealthRecordItem healthRecordItem) {
+        ContentValues cv = new ContentValues();
+        cv.put(COL_RECORD_ID, recordId);
+        cv.put(COL_LOOKUP_ID, healthRecordItem.id);
+        cv.put(COL_VALUE, healthRecordItem.getValue());
+        long insertResult = mDatabase.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
+        if (insertResult == -1) {
+            Log.d(TAG, "มีข้อมูลแล้ว, ทำการอัพเดท");
+
+            cv = new ContentValues();
+            cv.put(COL_VALUE, healthRecordItem.getValue());
+            return mDatabase.update(
+                    TABLE_HEALTH_RECORD_DETAILS,
+                    cv,
+                    COL_RECORD_ID + "=? AND " + COL_LOOKUP_ID + "=?",
+                    new String[]{String.valueOf(recordId), String.valueOf(healthRecordItem.id)}
+            ) > 0;
+        } else {
+            return true;
+        }
+    }
+
+    public HealthRecord addHealthRecord(Date date, String place, String doctor) {
+        String dateString = new MyDateFormatter().format(date);
+
+        ContentValues cv = new ContentValues();
+        cv.put(COL_DATE, dateString);
+        cv.put(COL_PLACE, place);
+        cv.put(COL_DOCTOR, doctor);
+        mDatabase.insert(TABLE_HEALTH_RECORD, null, cv);
+
+        return getHealthRecordByDate(date);
+    }
+
+    public void updateHealthRecordByDate(Date date, String place, String doctor) {
+        ContentValues cv = new ContentValues();
+        cv.put(COL_PLACE, place);
+        cv.put(COL_DOCTOR, doctor);
+
+        mDatabase.update(
+                TABLE_HEALTH_RECORD,
+                cv,
+                COL_DATE + "=?",
+                new String[]{new MyDateFormatter().format(date)}
+        );
+    }
+
+    public HealthRecord getHealthRecordByDate(Date date) {
+        String dateString = new MyDateFormatter().format(date);
+
+        Cursor cursor = mDatabase.query(
+                TABLE_HEALTH_RECORD,
+                null,
+                COL_DATE + "=?",
+                new String[]{dateString},
+                null,
+                null,
+                null
+        );
+        if (cursor.getCount() == 0) {
+            return null;
+        } else {
+            cursor.moveToFirst();
+            return new HealthRecord(
+                    cursor.getLong(cursor.getColumnIndex(COL_ID)),
+                    new MyDateFormatter().parse(cursor.getString(cursor.getColumnIndex(COL_DATE))),
+                    cursor.getString(cursor.getColumnIndex(COL_PLACE)),
+                    cursor.getString(cursor.getColumnIndex(COL_DOCTOR))
+            );
+        }
+    }
+
     public List<HealthRecordItem> testQuery() {
+        String dateString = "2018-05-08";
+
         String sql = "SELECT " + " l." + COL_ID + " AS lookup_id "
                 + ", l." + COL_TITLE + ", l." + COL_NAME + ", l." + COL_UNIT
                 + ", l." + COL_MIN_VALUE + ", l." + COL_MAX_VALUE + ", l." + COL_CATEGORY
-                + ", r." + COL_ID + " AS record_id "
-                + ", r." + COL_DATE + ", r." + COL_VALUE
-                + " FROM "
-                + TABLE_HEALTH_RECORD_LOOKUP + " l LEFT JOIN " + TABLE_HEALTH_RECORD + " r "
+                + ", r." + COL_VALUE
+                + " FROM health_record_lookup l LEFT JOIN "
+                + " (SELECT hrd.lookup_id, hrd.value FROM health_record hr INNER JOIN health_record_details hrd ON hr._id = hrd.record_id AND hr.date='" + dateString + "') AS r "
                 + " ON l." + COL_ID + "=" + " r." + COL_LOOKUP_ID
-                + " AND " + COL_DATE + "=?";
+                + " WHERE " + COL_CATEGORY + "=?";
 
-        String dateString = "2018-05-08";
-        Cursor cursor = mDatabase.rawQuery(sql, new String[]{dateString});
+        Cursor cursor = mDatabase.rawQuery(sql, new String[]{String.valueOf(1)});
 
         String dump = DatabaseUtils.dumpCursorToString(cursor);
         Log.d(TAG, dump);
@@ -246,6 +430,8 @@ public class CareDb {
             db.execSQL(SQL_CREATE_TABLE_CHECK_GUIDE);
             db.execSQL(SQL_CREATE_TABLE_HEALTH_RECORD_LOOKUP);
             db.execSQL(SQL_CREATE_TABLE_HEALTH_RECORD);
+            db.execSQL(SQL_CREATE_TABLE_HEALTH_RECORD_DETAILS);
+            db.execSQL(SQL_CREATE_TABLE_PROFILE);
             insertInitialData(db);
         }
 
@@ -705,28 +891,28 @@ public class CareDb {
             cv.put(COL_TITLE, "ระดับน้ำตาลในเลือด (FPG)");
             cv.put(COL_MIN_VALUE, 82);
             cv.put(COL_MAX_VALUE, 110);
-            cv.put(COL_CATEGORY, HEALTH_RECORD_CATEGORY_FAT_GLOCOSE);
+            cv.put(COL_CATEGORY, HEALTH_RECORD_CATEGORY_FAT_GLUCOSE);
             db.insert(TABLE_HEALTH_RECORD_LOOKUP, null, cv);
 
             cv = new ContentValues();
             cv.put(COL_TITLE, "ไขมันในเลือด (Cholesterol)");
             cv.put(COL_MIN_VALUE, 150);
             cv.put(COL_MAX_VALUE, 200);
-            cv.put(COL_CATEGORY, HEALTH_RECORD_CATEGORY_FAT_GLOCOSE);
+            cv.put(COL_CATEGORY, HEALTH_RECORD_CATEGORY_FAT_GLUCOSE);
             db.insert(TABLE_HEALTH_RECORD_LOOKUP, null, cv);
 
             cv = new ContentValues();
             cv.put(COL_TITLE, "อัตราส่วนโคเลสเตอรอลกับไขมันความหนาแน่นสูง (HDL)");
             cv.put(COL_MIN_VALUE, 40);
             cv.put(COL_MAX_VALUE, 999);
-            cv.put(COL_CATEGORY, HEALTH_RECORD_CATEGORY_FAT_GLOCOSE);
+            cv.put(COL_CATEGORY, HEALTH_RECORD_CATEGORY_FAT_GLUCOSE);
             db.insert(TABLE_HEALTH_RECORD_LOOKUP, null, cv);
 
             cv = new ContentValues();
             cv.put(COL_TITLE, "ระดับไขมันความหนาแน่นต่ำ (LDL)");
             cv.put(COL_MIN_VALUE, 0);
             cv.put(COL_MAX_VALUE, 150);
-            cv.put(COL_CATEGORY, HEALTH_RECORD_CATEGORY_FAT_GLOCOSE);
+            cv.put(COL_CATEGORY, HEALTH_RECORD_CATEGORY_FAT_GLUCOSE);
             db.insert(TABLE_HEALTH_RECORD_LOOKUP, null, cv);
 
             cv = new ContentValues();
@@ -759,28 +945,27 @@ public class CareDb {
 
             /////////////////////////////////////////////////////////////////////////
 
-            //insertTestHealthRecordData(db);
+            insertTestHealthRecordData(db);
         }
 
         private void insertTestHealthRecordData(SQLiteDatabase db) {
             ContentValues cv = new ContentValues();
-            cv.put(COL_LOOKUP_ID, 1);
             cv.put(COL_DATE, "2018-05-08");
-            cv.put(COL_VALUE, 52);
+            cv.put(COL_PLACE, "รพ.รามาธิบดี");
+            cv.put(COL_DOCTOR, "นพ.รามา ธิบดี");
             db.insert(TABLE_HEALTH_RECORD, null, cv);
 
             cv = new ContentValues();
-            cv.put(COL_LOOKUP_ID, 2);
-            cv.put(COL_DATE, "2018-05-08");
-            cv.put(COL_VALUE, 165);
-            db.insert(TABLE_HEALTH_RECORD, null, cv);
+            cv.put(COL_RECORD_ID, 1);
+            cv.put(COL_LOOKUP_ID, 1);
+            cv.put(COL_VALUE, 111);
+            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
 
             cv = new ContentValues();
-            cv.put(COL_LOOKUP_ID, 1);
-            cv.put(COL_DATE, "2018-05-09");
-            cv.put(COL_VALUE, 55);
-            db.insert(TABLE_HEALTH_RECORD, null, cv);
-
+            cv.put(COL_RECORD_ID, 1);
+            cv.put(COL_LOOKUP_ID, 4);
+            cv.put(COL_VALUE, 444);
+            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
         }
 
         @Override
@@ -788,6 +973,8 @@ public class CareDb {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHECKUP_GUIDE);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_HEALTH_RECORD_LOOKUP);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_HEALTH_RECORD);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_HEALTH_RECORD_DETAILS);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_PROFILE);
             onCreate(db);
         }
     }

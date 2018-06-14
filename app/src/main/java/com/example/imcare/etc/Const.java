@@ -16,7 +16,7 @@ public class Const {
     public static final int HEALTH_RECORD_CATEGORY_UNDEFINED = -1;
     public static final int HEALTH_RECORD_CATEGORY_BODY = 0;
     public static final int HEALTH_RECORD_CATEGORY_HEART_BLOOD = 1;
-    public static final int HEALTH_RECORD_CATEGORY_FAT_GLOCOSE = 2;
+    public static final int HEALTH_RECORD_CATEGORY_FAT_GLUCOSE = 2;
     public static final int HEALTH_RECORD_CATEGORY_SYSTEM = 3;
 
 }

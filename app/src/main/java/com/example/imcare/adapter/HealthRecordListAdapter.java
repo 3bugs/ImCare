@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static com.example.imcare.etc.Const.HEALTH_RECORD_CATEGORY_BODY;
-import static com.example.imcare.etc.Const.HEALTH_RECORD_CATEGORY_FAT_GLOCOSE;
+import static com.example.imcare.etc.Const.HEALTH_RECORD_CATEGORY_FAT_GLUCOSE;
 import static com.example.imcare.etc.Const.HEALTH_RECORD_CATEGORY_HEART_BLOOD;
 import static com.example.imcare.etc.Const.HEALTH_RECORD_CATEGORY_SYSTEM;
 import static com.example.imcare.etc.Const.HEALTH_RECORD_CATEGORY_UNDEFINED;
@@ -64,7 +64,7 @@ public class HealthRecordListAdapter extends
                     case HEALTH_RECORD_CATEGORY_HEART_BLOOD:
                         headerText = "หัวใจและเลือด";
                         break;
-                    case HEALTH_RECORD_CATEGORY_FAT_GLOCOSE:
+                    case HEALTH_RECORD_CATEGORY_FAT_GLUCOSE:
                         headerText = "ไขมันและน้ำตาลในเลือด";
                         break;
                     case HEALTH_RECORD_CATEGORY_SYSTEM:

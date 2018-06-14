@@ -1,7 +1,6 @@
 package com.example.imcare.fragment;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
@@ -43,6 +42,5 @@ public class ProfileDataFragment extends BaseFragment {
     }
 
     public interface ProfileDataFragmentListener {
-        void onFragmentInteraction(Uri uri);
     }
 }

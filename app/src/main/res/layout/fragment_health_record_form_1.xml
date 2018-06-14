@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragment.HealthRecordForm1Fragment"
+    tools:ignore="HardcodedText,ContentDescription">
+
+    <TextView
+        android:id="@+id/date_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="40dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="64dp"
+        android:text="วันที่ตรวจสุขภาพ"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/place_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="สถานที่ตรวจ"
+        app:layout_constraintStart_toStartOf="@+id/date_edit_text"
+        app:layout_constraintTop_toBottomOf="@+id/date_edit_text"/>
+
+    <EditText
+        android:id="@+id/date_edit_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_edit_text"
+        android:editable="false"
+        android:ems="10"
+        android:focusable="false"
+        android:foreground="?attr/selectableItemBackground"
+        android:gravity="center_horizontal"
+        android:hint="01   |   01   |   2561"
+        android:inputType="none"
+        app:layout_constraintEnd_toStartOf="@+id/date_icon_image_view"
+        app:layout_constraintStart_toStartOf="@+id/date_text_view"
+        app:layout_constraintTop_toBottomOf="@+id/date_text_view"
+        tools:ignore="Deprecated,TextFields"
+        tools:text="01   |   01   |   2561"/>
+
+    <ImageView
+        android:id="@+id/date_icon_image_view"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginRight="40dp"
+        android:foreground="?attr/selectableItemBackground"
+        android:src="@drawable/ic_calendar"
+        app:layout_constraintBottom_toBottomOf="@+id/date_edit_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/date_edit_text"/>
+
+    <EditText
+        android:id="@+id/place_edit_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_edit_text"
+        android:hint="กรอกสถานที่ตรวจ"
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="@+id/date_icon_image_view"
+        app:layout_constraintStart_toStartOf="@+id/place_text_view"
+        app:layout_constraintTop_toBottomOf="@+id/place_text_view"/>
+
+    <TextView
+        android:id="@+id/doctor_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="แพทย์ที่ตรวจ"
+        app:layout_constraintStart_toStartOf="@+id/place_edit_text"
+        app:layout_constraintTop_toBottomOf="@+id/place_edit_text"/>
+
+    <EditText
+        android:id="@+id/doctor_edit_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_edit_text"
+        android:ems="10"
+        android:hint="กรอกชื่อแพทย์ผู้ตรวจ"
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="@+id/place_edit_text"
+        app:layout_constraintStart_toStartOf="@+id/doctor_text_view"
+        app:layout_constraintTop_toBottomOf="@+id/doctor_text_view"/>
+
+    <Button
+        android:id="@+id/next_button"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/bg_button"
+        android:text="ถัดไป"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/doctor_edit_text"
+        app:layout_constraintStart_toStartOf="@+id/doctor_edit_text"
+        app:layout_constraintTop_toBottomOf="@+id/doctor_edit_text"/>
+
+</android.support.constraint.ConstraintLayout>

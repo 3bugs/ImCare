@@ -1,6 +1,5 @@
 package com.example.imcare;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -11,31 +10,58 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.example.imcare.db.CareDb;
+import com.example.imcare.etc.MyDateFormatter;
+import com.example.imcare.etc.Utils;
+import com.example.imcare.fragment.BaseFragment;
 import com.example.imcare.fragment.CheckupGuideFormFragment;
+import com.example.imcare.fragment.CheckupGuideMainFragment;
 import com.example.imcare.fragment.CheckupGuideResultFragment;
+import com.example.imcare.fragment.HealthRecordForm1Fragment;
+import com.example.imcare.fragment.HealthRecordForm2Fragment;
 import com.example.imcare.fragment.HealthRecordFormFragment;
 import com.example.imcare.fragment.HealthRecordGraphFragment;
+import com.example.imcare.fragment.HealthRecordMainFragment;
 import com.example.imcare.fragment.ProfileDataFragment;
+import com.example.imcare.model.HealthRecord;
+import com.example.imcare.model.Profile;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import static com.example.imcare.etc.Const.CHECKUP_GUIDE;
 import static com.example.imcare.etc.Const.HEALTH_RECORD;
+import static com.example.imcare.etc.Const.HEALTH_RECORD_CATEGORY_BODY;
+import static com.example.imcare.etc.Const.HEALTH_RECORD_CATEGORY_FAT_GLUCOSE;
+import static com.example.imcare.etc.Const.HEALTH_RECORD_CATEGORY_HEART_BLOOD;
+import static com.example.imcare.etc.Const.HEALTH_RECORD_CATEGORY_SYSTEM;
 import static com.example.imcare.etc.Const.PROFILE_DATA;
 
 public class MainActivity extends AppCompatActivity implements
         View.OnClickListener,
+        CheckupGuideMainFragment.CheckupGuideMainFragmentListener,
         CheckupGuideFormFragment.CheckupGuideFormFragmentListener,
+        HealthRecordMainFragment.HealthRecordMainFragmentListener,
+        HealthRecordForm1Fragment.HealthRecordForm1FragmentListener,
+        HealthRecordForm2Fragment.HealthRecordForm2FragmentListener,
         HealthRecordFormFragment.HealthRecordFormListener,
         ProfileDataFragment.ProfileDataFragmentListener,
         HealthRecordGraphFragment.HealthRecordGraphFragmentListener {
 
+    private static final String TAG = MainActivity.class.getName();
+
     ImageView mCheckupGuideImageView, mHealthRecordImageView, mProfileDataImageView;
+
+    private Calendar mHealthRecordDate = Calendar.getInstance();
+    private HealthRecord mHealthRecord = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //new CareDb(this).testQuery();
 
         setupToolbar();
 
@@ -47,7 +73,18 @@ public class MainActivity extends AppCompatActivity implements
         mHealthRecordImageView.setOnClickListener(this);
         mProfileDataImageView.setOnClickListener(this);
 
-        loadFragment(HEALTH_RECORD);
+        loadTopFragment(HEALTH_RECORD);
+
+        CareDb careDb = new CareDb(this);
+        String dateString = new MyDateFormatter().format(careDb.getProfile().birthDate);
+        int sex = careDb.getProfile().sex;
+        String msg = String.format(
+                Locale.getDefault(),
+                "Birth date: %s\nSex: %d",
+                dateString,
+                sex
+        );
+        Utils.showLongToast(this, msg);
     }
 
     private void setupToolbar() {
@@ -67,27 +104,27 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.checkup_guide_image_view:
-                loadFragment(CHECKUP_GUIDE);
-                break;
             case R.id.health_record_image_view:
-                loadFragment(HEALTH_RECORD);
+                loadTopFragment(HEALTH_RECORD);
+                break;
+            case R.id.checkup_guide_image_view:
+                loadTopFragment(CHECKUP_GUIDE);
                 break;
             case R.id.profile_data_image_view:
-                loadFragment(PROFILE_DATA);
+                loadTopFragment(PROFILE_DATA);
                 break;
         }
     }
 
-    private void loadFragment(int type) {
+    private void loadTopFragment(int type) {
         Fragment fragment = null;
 
         switch (type) {
-            case CHECKUP_GUIDE:
-                fragment = new CheckupGuideFormFragment();
-                break;
             case HEALTH_RECORD:
-                fragment = new HealthRecordFormFragment();
+                fragment = new HealthRecordMainFragment();
+                break;
+            case CHECKUP_GUIDE:
+                fragment = new CheckupGuideMainFragment();
                 break;
             case PROFILE_DATA:
                 fragment = new ProfileDataFragment();
@@ -107,9 +144,18 @@ public class MainActivity extends AppCompatActivity implements
 
     private void clearBackStack() {
         FragmentManager fm = getSupportFragmentManager();
-        for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {
+        for (int i = 0; i < fm.getBackStackEntryCount(); ++i) {
             fm.popBackStack();
         }
+    }
+
+    private void loadFragment(BaseFragment fragment) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(
+                        R.id.fragment_container,
+                        fragment
+                ).addToBackStack(null)
+                .commit();
     }
 
     private void updateBottomNavImage(int type) {
@@ -132,11 +178,9 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onSubmitCheckupGuideForm(int age, int sex) {
-        Fragment fragment = CheckupGuideResultFragment.newInstance(age, sex);
-        getSupportFragmentManager().beginTransaction().replace(
-                R.id.fragment_container,
-                fragment
-        ).addToBackStack(null).commit();
+        getSupportFragmentManager().popBackStackImmediate();
+        CheckupGuideResultFragment fragment = CheckupGuideResultFragment.newInstance(age, sex);
+        loadFragment(fragment);
     }
 
     @Override
@@ -149,7 +193,84 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
+    public void onHealthRecordMainButtonClick(int which) {
+        BaseFragment fragment = null;
+        switch (which) {
+            case 1:
+                fragment = new HealthRecordForm1Fragment();
+                break;
+            case 2:
+                fragment = new HealthRecordGraphFragment();
+                break;
+        }
+        loadFragment(fragment);
+    }
 
+    @Override
+    public void onCheckupGuideMainButtonClick(int which) {
+        BaseFragment fragment = null;
+        switch (which) {
+            case 1:
+                Profile profile = new CareDb(this).getProfile();
+                int age = profile.getAge();
+                int sex = profile.sex;
+                fragment = CheckupGuideResultFragment.newInstance(age, sex);
+                break;
+            case 2:
+                fragment = new CheckupGuideFormFragment();
+                break;
+        }
+        loadFragment(fragment);
+    }
+
+    @Override
+    public Calendar getHealthRecordDate() {
+        return mHealthRecordDate;
+    }
+
+    @Override
+    public void setHealthRecord(HealthRecord healthRecord) {
+        mHealthRecord = healthRecord;
+    }
+
+    @Override
+    public HealthRecord getHealthRecord() {
+        return mHealthRecord;
+    }
+
+    @Override
+    public void onHealthRecordForm1_Next() {
+        loadFragment(HealthRecordForm2Fragment.newInstance(HEALTH_RECORD_CATEGORY_BODY));
+    }
+
+    @Override
+    public void onHealthRecordForm2_Previous(int currentHealthRecordCategory) {
+        getSupportFragmentManager().popBackStackImmediate();
+    }
+
+    @Override
+    public void onHealthRecordForm2_Next(int currentHealthRecordCategory) {
+        int nextHealthRecordCategory = 0;
+        switch (currentHealthRecordCategory) {
+            case HEALTH_RECORD_CATEGORY_BODY:
+                nextHealthRecordCategory = HEALTH_RECORD_CATEGORY_HEART_BLOOD;
+                break;
+            case HEALTH_RECORD_CATEGORY_HEART_BLOOD:
+                nextHealthRecordCategory = HEALTH_RECORD_CATEGORY_FAT_GLUCOSE;
+                break;
+            case HEALTH_RECORD_CATEGORY_FAT_GLUCOSE:
+                nextHealthRecordCategory = HEALTH_RECORD_CATEGORY_SYSTEM;
+                break;
+            case HEALTH_RECORD_CATEGORY_SYSTEM:
+
+                break;
+        }
+        if (currentHealthRecordCategory != HEALTH_RECORD_CATEGORY_SYSTEM) {
+            loadFragment(HealthRecordForm2Fragment.newInstance(nextHealthRecordCategory));
+        } else {
+            loadTopFragment(HEALTH_RECORD);
+            mHealthRecord = null;
+            Utils.showLongToast(this, "บันทึกข้อมูลเรียบร้อย");
+        }
     }
 }

@@ -100,9 +100,9 @@ public class HealthRecordFormFragment extends BaseFragment implements View.OnCli
 
     private void updateList() {
         if (getContext() != null) {
-            mAdapter.setHealthRecordItemList(
-                    new CareDb(getContext()).getHealthRecordItemListByDate(mCalendar.getTime())
-            );
+            /*mAdapter.setHealthRecordItemList(
+                    new CareDb(getContext()).getHealthRecordItemListByDateAndCategory(mCalendar.getTime())
+            );*/
             mAdapter.notifyDataSetChanged();
         }
     }

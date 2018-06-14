@@ -11,14 +11,24 @@
     android:paddingTop="4dp"
     tools:ignore="ContentDescription">
 
-    <ImageView
+    <!--<ImageView
         android:id="@+id/bullet_image_view"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginTop="2dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/title_text_view"
-        app:srcCompat="@drawable/ic_check"/>
+        app:srcCompat="@drawable/ic_check"/>-->
+
+    <TextView
+        android:id="@+id/number_text_view"
+        android:layout_width="32dp"
+        android:layout_height="24dp"
+        android:gravity="end"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/title_text_view"
+        tools:text="1."/>
 
     <TextView
         android:id="@+id/title_text_view"
@@ -29,7 +39,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/bullet_image_view"
+        app:layout_constraintStart_toEndOf="@+id/number_text_view"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="การตรวจสัญญาณชีพจร"/>
 

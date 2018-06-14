@@ -50,7 +50,7 @@ public class CheckupGuideFormFragment extends BaseFragment implements View.OnCli
         mAgeEditText = view.findViewById(R.id.age_edit_text);
         mMaleImageLayout = view.findViewById(R.id.male_image_layout);
         mFemaleImageLayout = view.findViewById(R.id.female_image_layout);
-        Button submitButton = view.findViewById(R.id.submit_button);
+        Button submitButton = view.findViewById(R.id.next_button);
 
         mMaleImageLayout.setOnClickListener(this);
         mFemaleImageLayout.setOnClickListener(this);
@@ -106,7 +106,7 @@ public class CheckupGuideFormFragment extends BaseFragment implements View.OnCli
                 mSex = SEX_FEMALE;
                 updateSexImage();
                 break;
-            case R.id.submit_button:
+            case R.id.next_button:
                 submitButtonClicked();
                 break;
         }

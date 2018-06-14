@@ -11,6 +11,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.imcare.R;
+import com.example.imcare.adapter.CheckupGuideResultListAdapter;
 import com.example.imcare.db.CareDb;
 
 import java.util.ArrayList;
@@ -28,6 +29,8 @@ public class CheckupGuideResultFragment extends BaseFragment {
     private int mSex;
     private List<String> mCheckupList = new ArrayList<>();
     private ArrayAdapter<String> mAdapter;
+
+    private TextView mListCountTextView;
 
     public CheckupGuideResultFragment() {
         // Required empty public constructor
@@ -62,19 +65,20 @@ public class CheckupGuideResultFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mListCountTextView = view.findViewById(R.id.list_count_text_view);
+
         TextView ageSexTextView = view.findViewById(R.id.age_sex_text_view);
         ageSexTextView.setText(String.format(
                 Locale.getDefault(),
-                "เพศ: %s, อายุ %d ปี",
+                "เพศ: %s, อายุ: %d ปี",
                 mSex == SEX_MALE ? "ชาย" : "หญิง",
                 mAge
         ));
 
         if (getContext() != null) {
-            mAdapter = new ArrayAdapter<>(
+            mAdapter = new CheckupGuideResultListAdapter(
                     getContext(),
                     R.layout.item_checkup,
-                    R.id.title_text_view,
                     mCheckupList
             );
             ListView listView = view.findViewById(R.id.list_view);
@@ -93,6 +97,7 @@ public class CheckupGuideResultFragment extends BaseFragment {
             return;
         }
         List<String> checkupList = new CareDb(getContext()).getCheckupListByAgeAndSex(mAge, mSex);
+        mListCountTextView.setText(String.valueOf(checkupList.size()));
         mCheckupList.clear();
         mCheckupList.addAll(checkupList);
         mAdapter.notifyDataSetChanged();

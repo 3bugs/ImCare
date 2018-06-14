@@ -1,7 +1,6 @@
 package com.example.imcare.fragment;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,7 +12,6 @@ import android.view.ViewGroup;
 
 import com.example.imcare.R;
 import com.example.imcare.adapter.HealthRecordGraphListAdapter;
-import com.example.imcare.db.CareDb;
 import com.example.imcare.etc.MyDateFormatter;
 import com.example.imcare.model.HealthRecordItem;
 
@@ -50,7 +48,7 @@ public class HealthRecordGraphFragment extends BaseFragment {
         if (getArguments() != null) {
             mDate = new MyDateFormatter().parse(getArguments().getString(ARG_DATE));
             if (getContext() != null) {
-                mHealthRecordItemList = new CareDb(getContext()).getHealthRecordItemListByDate(mDate);
+                //mHealthRecordItemList = new CareDb(getContext()).getHealthRecordItemListByDateAndCategory(mDate);
             }
         }
         //Toast.makeText(getContext(), "Count: " + mHealthRecordItemList.size(), Toast.LENGTH_SHORT).show();
@@ -93,6 +91,5 @@ public class HealthRecordGraphFragment extends BaseFragment {
     }
 
     public interface HealthRecordGraphFragmentListener {
-        void onFragmentInteraction(Uri uri);
     }
 }

@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.imcare.db.CareDb;
 import com.example.imcare.etc.Utils;
 
 import java.text.SimpleDateFormat;
@@ -37,6 +38,13 @@ public class FirstRunFormActivity extends AppCompatActivity implements View.OnCl
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (new CareDb(this).getProfile() != null) {
+            startMainActivity();
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_first_run_form);
 
         mSexTextView = findViewById(R.id.sex_text_view);
@@ -46,7 +54,7 @@ public class FirstRunFormActivity extends AppCompatActivity implements View.OnCl
         mFemaleImageView = findViewById(R.id.female_image_view);
         mMaleImageView.setOnClickListener(this);
         mFemaleImageView.setOnClickListener(this);
-        Button submitButton = findViewById(R.id.submit_button);
+        Button submitButton = findViewById(R.id.next_button);
         submitButton.setOnClickListener(this);
     }
 
@@ -140,11 +148,16 @@ public class FirstRunFormActivity extends AppCompatActivity implements View.OnCl
 
     private void submitButtonClicked() {
         if (validateForm()) {
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
+            new CareDb(this).setProfile(mCalendar.getTime(), mSex);
+            startMainActivity();
         } else {
             Toast.makeText(this, "กรอกข้อมูลให้ครบถ้วน", Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void startMainActivity() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 
     private boolean validateForm() {
@@ -183,7 +196,7 @@ public class FirstRunFormActivity extends AppCompatActivity implements View.OnCl
                 updateSexImage();
                 mSexTextView.setError(null);
                 break;
-            case R.id.submit_button:
+            case R.id.next_button:
                 submitButtonClicked();
                 break;
         }
