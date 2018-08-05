@@ -21,6 +21,7 @@ import com.example.imcare.fragment.HealthRecordForm1Fragment;
 import com.example.imcare.fragment.HealthRecordForm2Fragment;
 import com.example.imcare.fragment.HealthRecordFormFragment;
 import com.example.imcare.fragment.HealthRecordGraphFragment;
+import com.example.imcare.fragment.HealthRecordListFragment;
 import com.example.imcare.fragment.HealthRecordMainFragment;
 import com.example.imcare.fragment.ProfileDataFragment;
 import com.example.imcare.model.HealthRecord;
@@ -47,7 +48,8 @@ public class MainActivity extends AppCompatActivity implements
         HealthRecordForm2Fragment.HealthRecordForm2FragmentListener,
         HealthRecordFormFragment.HealthRecordFormListener,
         ProfileDataFragment.ProfileDataFragmentListener,
-        HealthRecordGraphFragment.HealthRecordGraphFragmentListener {
+        HealthRecordGraphFragment.HealthRecordGraphFragmentListener,
+        HealthRecordListFragment.HealthRecordListFragmentListener {
 
     private static final String TAG = MainActivity.class.getName();
 
@@ -60,8 +62,6 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        //new CareDb(this).testQuery();
 
         setupToolbar();
 
@@ -127,7 +127,8 @@ public class MainActivity extends AppCompatActivity implements
                 fragment = new CheckupGuideMainFragment();
                 break;
             case PROFILE_DATA:
-                fragment = new ProfileDataFragment();
+                //fragment = new ProfileDataFragment();
+                fragment = HealthRecordListFragment.newInstance(2);
                 break;
         }
 
@@ -185,11 +186,11 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onViewGraphButtonClicked(Date date) {
-        Fragment fragment = HealthRecordGraphFragment.newInstance(date);
+        /*Fragment fragment = HealthRecordGraphFragment.newInstance(date);
         getSupportFragmentManager().beginTransaction().replace(
                 R.id.fragment_container,
                 fragment
-        ).addToBackStack(null).commit();
+        ).addToBackStack(null).commit();*/
     }
 
     @Override
@@ -200,7 +201,8 @@ public class MainActivity extends AppCompatActivity implements
                 fragment = new HealthRecordForm1Fragment();
                 break;
             case 2:
-                fragment = new HealthRecordGraphFragment();
+                //fragment = new HealthRecordGraphFragment();
+                fragment = HealthRecordListFragment.newInstance(1);
                 break;
         }
         loadFragment(fragment);
@@ -271,6 +273,18 @@ public class MainActivity extends AppCompatActivity implements
             loadTopFragment(HEALTH_RECORD);
             mHealthRecord = null;
             Utils.showLongToast(this, "บันทึกข้อมูลเรียบร้อย");
+        }
+    }
+
+    @Override
+    public void onHealthRecordItemClick(HealthRecord healthRecord, int which) {
+        switch (which) {
+            case 1:
+                HealthRecordGraphFragment fragment = HealthRecordGraphFragment.newInstance(healthRecord);
+                loadFragment(fragment);
+                break;
+            case 2:
+                break;
         }
     }
 }

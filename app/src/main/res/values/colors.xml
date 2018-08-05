@@ -10,6 +10,8 @@
     <color name="foreground_select">#30239e55</color>
     <color name="background_edit_text">#ffffff</color>
     <color name="border_edit_text">#979797</color>
+
+    <color name="test">#ffa435</color>
     <!--<color name="background_material_light"
            tools:override="true">@color/background
     </color>-->

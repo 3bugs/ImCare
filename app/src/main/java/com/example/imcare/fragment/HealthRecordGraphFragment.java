@@ -12,19 +12,20 @@ import android.view.ViewGroup;
 
 import com.example.imcare.R;
 import com.example.imcare.adapter.HealthRecordGraphListAdapter;
-import com.example.imcare.etc.MyDateFormatter;
+import com.example.imcare.db.CareDb;
+import com.example.imcare.model.HealthRecord;
 import com.example.imcare.model.HealthRecordItem;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class HealthRecordGraphFragment extends BaseFragment {
 
     private static final String TAG = HealthRecordGraphFragment.class.getName();
-    private static final String ARG_DATE = "date";
+    private static final String ARG_HEALTH_RECORD = "health_record";
 
-    private Date mDate;
+    private HealthRecord mHealthRecord;
     private List<HealthRecordItem> mHealthRecordItemList = new ArrayList<>();
 
     private HealthRecordGraphFragmentListener mListener;
@@ -34,10 +35,10 @@ public class HealthRecordGraphFragment extends BaseFragment {
         setTitle("เปรียบเทียบผลการตรวจสุขภาพ");
     }
 
-    public static HealthRecordGraphFragment newInstance(Date date) {
+    public static HealthRecordGraphFragment newInstance(HealthRecord healthRecord) {
         HealthRecordGraphFragment fragment = new HealthRecordGraphFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_DATE, new MyDateFormatter().format(date));
+        args.putString(ARG_HEALTH_RECORD, new Gson().toJson(healthRecord));
         fragment.setArguments(args);
         return fragment;
     }
@@ -46,9 +47,10 @@ public class HealthRecordGraphFragment extends BaseFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mDate = new MyDateFormatter().parse(getArguments().getString(ARG_DATE));
+            mHealthRecord = new Gson().fromJson(getArguments().getString(ARG_HEALTH_RECORD), HealthRecord.class);
             if (getContext() != null) {
-                //mHealthRecordItemList = new CareDb(getContext()).getHealthRecordItemListByDateAndCategory(mDate);
+                mHealthRecordItemList = new CareDb(getContext())
+                        .getHealthRecordItemListByDateAndCategory(mHealthRecord.date, -1);
             }
         }
         //Toast.makeText(getContext(), "Count: " + mHealthRecordItemList.size(), Toast.LENGTH_SHORT).show();
