@@ -87,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements
                 sex
         );
         Utils.showLongToast(this, msg);
+
+        new CareDb(this).getHealthRecordItemByLookup(1);
     }
 
     private void setupToolbar() {

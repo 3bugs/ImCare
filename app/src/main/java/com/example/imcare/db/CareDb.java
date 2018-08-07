@@ -33,7 +33,7 @@ public class CareDb {
     public static final String STORED_DATE_FORMAT = "yyyy-MM-dd";
 
     private static final String DATABASE_NAME = "care.db";
-    private static final int DATABASE_VERSION = 12;
+    private static final int DATABASE_VERSION = 15;
 
     // เทเบิล checkup_guide
     // +-----+-------+-----+---------+---------+
@@ -235,6 +235,21 @@ public class CareDb {
         }
         cursor.close();
         return healthRecordList;
+    }
+
+    public void getHealthRecordItemByLookup(int lookupId) {
+        String sql = "SELECT hr.date AS date, hrd.value AS value "
+                + " FROM health_record hr INNER JOIN health_record_details hrd ON hr._id = hrd.record_id "
+                + " WHERE hrd.lookup_id = ? ";
+        Cursor cursor = mDatabase.rawQuery(sql, new String[]{String.valueOf(lookupId)});
+
+        while (cursor.moveToNext()) {
+            String date = cursor.getString(cursor.getColumnIndex("date"));
+            float value = cursor.getFloat(cursor.getColumnIndex("value"));
+            Log.i(TAG, String.format(Locale.getDefault(), "Date: %s, Value: %.1f", date, value));
+        }
+
+        cursor.close();
     }
 
     public List<HealthRecordItem> getHealthRecordItemListByDateAndCategory(Date date, int category) {
@@ -992,7 +1007,7 @@ public class CareDb {
 
         private void insertTestHealthRecordData(SQLiteDatabase db) {
             ContentValues cv = new ContentValues();
-            cv.put(COL_DATE, "2018-06-01");
+            cv.put(COL_DATE, "2017-06-01");
             cv.put(COL_PLACE, "รพ.รามาธิบดี");
             cv.put(COL_DOCTOR, "นพ.รามา ธิบดี");
             db.insert(TABLE_HEALTH_RECORD, null, cv);
@@ -1000,95 +1015,197 @@ public class CareDb {
             cv = new ContentValues();
             cv.put(COL_RECORD_ID, 1);
             cv.put(COL_LOOKUP_ID, 1);
-            cv.put(COL_VALUE, 50);
-            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
-
-            cv = new ContentValues();
-            cv.put(COL_RECORD_ID, 1);
-            cv.put(COL_LOOKUP_ID, 2);
-            cv.put(COL_VALUE, 160);
-            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
-
-            cv = new ContentValues();
-            cv.put(COL_RECORD_ID, 1);
-            cv.put(COL_LOOKUP_ID, 3);
-            cv.put(COL_VALUE, 38);
-            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
-
-            cv = new ContentValues();
-            cv.put(COL_RECORD_ID, 1);
-            cv.put(COL_LOOKUP_ID, 4);
-            cv.put(COL_VALUE, 145);
-            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
-
-            cv = new ContentValues();
-            cv.put(COL_RECORD_ID, 1);
-            cv.put(COL_LOOKUP_ID, 5);
-            cv.put(COL_VALUE, 97);
-            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
-
-            cv = new ContentValues();
-            cv.put(COL_RECORD_ID, 1);
-            cv.put(COL_LOOKUP_ID, 6);
-            cv.put(COL_VALUE, 80);
-            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
-
-            cv = new ContentValues();
-            cv.put(COL_RECORD_ID, 1);
-            cv.put(COL_LOOKUP_ID, 7);
-            cv.put(COL_VALUE, 15.2);
-            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
-
-            cv = new ContentValues();
-            cv.put(COL_RECORD_ID, 1);
-            cv.put(COL_LOOKUP_ID, 8);
             cv.put(COL_VALUE, 48);
             db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
 
             cv = new ContentValues();
             cv.put(COL_RECORD_ID, 1);
+            cv.put(COL_LOOKUP_ID, 2);
+            cv.put(COL_VALUE, 158);
+            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
+
+            cv = new ContentValues();
+            cv.put(COL_RECORD_ID, 1);
+            cv.put(COL_LOOKUP_ID, 3);
+            cv.put(COL_VALUE, 36);
+            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
+
+            cv = new ContentValues();
+            cv.put(COL_RECORD_ID, 1);
+            cv.put(COL_LOOKUP_ID, 4);
+            cv.put(COL_VALUE, 143);
+            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
+
+            cv = new ContentValues();
+            cv.put(COL_RECORD_ID, 1);
+            cv.put(COL_LOOKUP_ID, 5);
+            cv.put(COL_VALUE, 95);
+            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
+
+            cv = new ContentValues();
+            cv.put(COL_RECORD_ID, 1);
+            cv.put(COL_LOOKUP_ID, 6);
+            cv.put(COL_VALUE, 78);
+            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
+
+            cv = new ContentValues();
+            cv.put(COL_RECORD_ID, 1);
+            cv.put(COL_LOOKUP_ID, 7);
+            cv.put(COL_VALUE, 13.2);
+            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
+
+            cv = new ContentValues();
+            cv.put(COL_RECORD_ID, 1);
+            cv.put(COL_LOOKUP_ID, 8);
+            cv.put(COL_VALUE, 46);
+            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
+
+            cv = new ContentValues();
+            cv.put(COL_RECORD_ID, 1);
             cv.put(COL_LOOKUP_ID, 9);
-            cv.put(COL_VALUE, 125);
+            cv.put(COL_VALUE, 123);
             db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
 
             cv = new ContentValues();
             cv.put(COL_RECORD_ID, 1);
             cv.put(COL_LOOKUP_ID, 10);
-            cv.put(COL_VALUE, 222);
+            cv.put(COL_VALUE, 220);
             db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
 
             cv = new ContentValues();
             cv.put(COL_RECORD_ID, 1);
             cv.put(COL_LOOKUP_ID, 11);
-            cv.put(COL_VALUE, 950);
+            cv.put(COL_VALUE, 948);
             db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
 
             cv = new ContentValues();
             cv.put(COL_RECORD_ID, 1);
             cv.put(COL_LOOKUP_ID, 12);
-            cv.put(COL_VALUE, 133);
+            cv.put(COL_VALUE, 131);
             db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
 
             cv = new ContentValues();
             cv.put(COL_RECORD_ID, 1);
             cv.put(COL_LOOKUP_ID, 13);
-            cv.put(COL_VALUE, 7);
+            cv.put(COL_VALUE, 5);
             db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
 
             cv = new ContentValues();
             cv.put(COL_RECORD_ID, 1);
             cv.put(COL_LOOKUP_ID, 14);
-            cv.put(COL_VALUE, 35);
+            cv.put(COL_VALUE, 33);
             db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
 
             cv = new ContentValues();
             cv.put(COL_RECORD_ID, 1);
             cv.put(COL_LOOKUP_ID, 15);
-            cv.put(COL_VALUE, 6);
+            cv.put(COL_VALUE, 4);
             db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
 
             cv = new ContentValues();
             cv.put(COL_RECORD_ID, 1);
+            cv.put(COL_LOOKUP_ID, 16);
+            cv.put(COL_VALUE, 198);
+            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
+
+            cv = new ContentValues();
+            cv.put(COL_DATE, "2018-06-01");
+            cv.put(COL_PLACE, "รพ.รามาธิบดี");
+            cv.put(COL_DOCTOR, "นพ.รามา ธิบดี");
+            db.insert(TABLE_HEALTH_RECORD, null, cv);
+
+            cv = new ContentValues();
+            cv.put(COL_RECORD_ID, 2);
+            cv.put(COL_LOOKUP_ID, 1);
+            cv.put(COL_VALUE, 50);
+            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
+
+            cv = new ContentValues();
+            cv.put(COL_RECORD_ID, 2);
+            cv.put(COL_LOOKUP_ID, 2);
+            cv.put(COL_VALUE, 160);
+            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
+
+            cv = new ContentValues();
+            cv.put(COL_RECORD_ID, 2);
+            cv.put(COL_LOOKUP_ID, 3);
+            cv.put(COL_VALUE, 38);
+            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
+
+            cv = new ContentValues();
+            cv.put(COL_RECORD_ID, 2);
+            cv.put(COL_LOOKUP_ID, 4);
+            cv.put(COL_VALUE, 145);
+            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
+
+            cv = new ContentValues();
+            cv.put(COL_RECORD_ID, 2);
+            cv.put(COL_LOOKUP_ID, 5);
+            cv.put(COL_VALUE, 97);
+            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
+
+            cv = new ContentValues();
+            cv.put(COL_RECORD_ID, 2);
+            cv.put(COL_LOOKUP_ID, 6);
+            cv.put(COL_VALUE, 80);
+            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
+
+            cv = new ContentValues();
+            cv.put(COL_RECORD_ID, 2);
+            cv.put(COL_LOOKUP_ID, 7);
+            cv.put(COL_VALUE, 15.2);
+            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
+
+            cv = new ContentValues();
+            cv.put(COL_RECORD_ID, 2);
+            cv.put(COL_LOOKUP_ID, 8);
+            cv.put(COL_VALUE, 48);
+            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
+
+            cv = new ContentValues();
+            cv.put(COL_RECORD_ID, 2);
+            cv.put(COL_LOOKUP_ID, 9);
+            cv.put(COL_VALUE, 125);
+            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
+
+            cv = new ContentValues();
+            cv.put(COL_RECORD_ID, 2);
+            cv.put(COL_LOOKUP_ID, 10);
+            cv.put(COL_VALUE, 222);
+            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
+
+            cv = new ContentValues();
+            cv.put(COL_RECORD_ID, 2);
+            cv.put(COL_LOOKUP_ID, 11);
+            cv.put(COL_VALUE, 950);
+            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
+
+            cv = new ContentValues();
+            cv.put(COL_RECORD_ID, 2);
+            cv.put(COL_LOOKUP_ID, 12);
+            cv.put(COL_VALUE, 133);
+            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
+
+            cv = new ContentValues();
+            cv.put(COL_RECORD_ID, 2);
+            cv.put(COL_LOOKUP_ID, 13);
+            cv.put(COL_VALUE, 7);
+            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
+
+            cv = new ContentValues();
+            cv.put(COL_RECORD_ID, 2);
+            cv.put(COL_LOOKUP_ID, 14);
+            cv.put(COL_VALUE, 35);
+            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
+
+            cv = new ContentValues();
+            cv.put(COL_RECORD_ID, 2);
+            cv.put(COL_LOOKUP_ID, 15);
+            cv.put(COL_VALUE, 6);
+            db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
+
+            cv = new ContentValues();
+            cv.put(COL_RECORD_ID, 2);
             cv.put(COL_LOOKUP_ID, 16);
             cv.put(COL_VALUE, 200);
             db.insert(TABLE_HEALTH_RECORD_DETAILS, null, cv);
