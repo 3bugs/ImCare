@@ -93,7 +93,7 @@ public class HealthRecordForm2Fragment extends BaseFragment implements View.OnCl
             nextButton.setText("เสร็จสิ้น");
         }
 
-        final RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+        final RecyclerView recyclerView = view.findViewById(R.id.record_item_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mAdapter = new HealthRecordListAdapter(
                 getContext(),

@@ -33,7 +33,7 @@ public class CareDb {
     public static final String STORED_DATE_FORMAT = "yyyy-MM-dd";
 
     private static final String DATABASE_NAME = "care.db";
-    private static final int DATABASE_VERSION = 11;
+    private static final int DATABASE_VERSION = 12;
 
     // เทเบิล checkup_guide
     // +-----+-------+-----+---------+---------+
@@ -151,7 +151,7 @@ public class CareDb {
         mDatabase.delete(TABLE_PROFILE, null, null);
 
         ContentValues cv = new ContentValues();
-        cv.put(COL_BIRTH_DATE, new MyDateFormatter().format(birthDate));
+        cv.put(COL_BIRTH_DATE, new MyDateFormatter().formatDb(birthDate));
         cv.put(COL_SEX, sex);
         mDatabase.insert(TABLE_PROFILE, null, cv);
     }
@@ -173,10 +173,11 @@ public class CareDb {
         } else {
             cursor.moveToFirst();
             profile = new Profile(
-                    new MyDateFormatter().parse(cursor.getString(cursor.getColumnIndex(COL_BIRTH_DATE))),
+                    new MyDateFormatter().parseDb(cursor.getString(cursor.getColumnIndex(COL_BIRTH_DATE))),
                     cursor.getInt(cursor.getColumnIndex(COL_SEX))
             );
         }
+        cursor.close();
         return profile;
     }
 
@@ -229,7 +230,7 @@ public class CareDb {
             String doctor = cursor.getString(cursor.getColumnIndex(COL_DOCTOR));
 
             healthRecordList.add(
-                    new HealthRecord(id, new MyDateFormatter().parse(dateString), place, doctor)
+                    new HealthRecord(id, new MyDateFormatter().parseDb(dateString), place, doctor)
             );
         }
         cursor.close();
@@ -240,7 +241,7 @@ public class CareDb {
         List<HealthRecordItem> healthRecordItemList = new ArrayList<>();
 
         final String LOOKUP_ID = "lookup_id";
-        String dateString = new MyDateFormatter().format(date);
+        String dateString = new MyDateFormatter().formatDb(date);
 
         String sql = "SELECT " + " l." + COL_ID + " AS " + LOOKUP_ID
                 + ", l." + COL_TITLE + ", l." + COL_NAME + ", l." + COL_UNIT
@@ -300,7 +301,7 @@ public class CareDb {
                 + " AND " + COL_DATE + "=?";
 
         SimpleDateFormat formatter = new SimpleDateFormat(STORED_DATE_FORMAT, Locale.US);
-        String dateString = formatter.format(date);
+        String dateString = formatter.formatDb(date);
         Cursor cursor = mDatabase.rawQuery(sql, new String[]{dateString});
 
         while (cursor.moveToNext()) {
@@ -381,7 +382,7 @@ public class CareDb {
     }
 
     public HealthRecord addHealthRecord(Date date, String place, String doctor) {
-        String dateString = new MyDateFormatter().format(date);
+        String dateString = new MyDateFormatter().formatDb(date);
 
         ContentValues cv = new ContentValues();
         cv.put(COL_DATE, dateString);
@@ -401,12 +402,12 @@ public class CareDb {
                 TABLE_HEALTH_RECORD,
                 cv,
                 COL_DATE + "=?",
-                new String[]{new MyDateFormatter().format(date)}
+                new String[]{new MyDateFormatter().formatDb(date)}
         );
     }
 
     public HealthRecord getHealthRecordByDate(Date date) {
-        String dateString = new MyDateFormatter().format(date);
+        String dateString = new MyDateFormatter().formatDb(date);
 
         Cursor cursor = mDatabase.query(
                 TABLE_HEALTH_RECORD,
@@ -418,15 +419,18 @@ public class CareDb {
                 null
         );
         if (cursor.getCount() == 0) {
+            cursor.close();
             return null;
         } else {
             cursor.moveToFirst();
-            return new HealthRecord(
+            HealthRecord healthRecord = new HealthRecord(
                     cursor.getLong(cursor.getColumnIndex(COL_ID)),
-                    new MyDateFormatter().parse(cursor.getString(cursor.getColumnIndex(COL_DATE))),
+                    new MyDateFormatter().parseDb(cursor.getString(cursor.getColumnIndex(COL_DATE))),
                     cursor.getString(cursor.getColumnIndex(COL_PLACE)),
                     cursor.getString(cursor.getColumnIndex(COL_DOCTOR))
             );
+            cursor.close();
+            return healthRecord;
         }
     }
 
@@ -883,6 +887,7 @@ public class CareDb {
 
             cv = new ContentValues();
             cv.put(COL_TITLE, "ความดันโลหิต (BP) ค่าบน");
+            cv.put(COL_UNIT, "mm Hg");
             cv.put(COL_MIN_VALUE, 120);
             cv.put(COL_MAX_VALUE, 129);
             cv.put(COL_CATEGORY, HEALTH_RECORD_CATEGORY_HEART_BLOOD);
@@ -890,6 +895,7 @@ public class CareDb {
 
             cv = new ContentValues();
             cv.put(COL_TITLE, "ความดันโลหิต (BP) ค่าล่าง");
+            cv.put(COL_UNIT, "mm Hg");
             cv.put(COL_MIN_VALUE, 80);
             cv.put(COL_MAX_VALUE, 84);
             cv.put(COL_CATEGORY, HEALTH_RECORD_CATEGORY_HEART_BLOOD);
@@ -920,6 +926,7 @@ public class CareDb {
 
             cv = new ContentValues();
             cv.put(COL_TITLE, "ระดับน้ำตาลในเลือด (FPG)");
+            cv.put(COL_UNIT, "mg/dL");
             cv.put(COL_MIN_VALUE, 82);
             cv.put(COL_MAX_VALUE, 110);
             cv.put(COL_CATEGORY, HEALTH_RECORD_CATEGORY_FAT_GLUCOSE);
@@ -927,6 +934,7 @@ public class CareDb {
 
             cv = new ContentValues();
             cv.put(COL_TITLE, "ไขมันในเลือด (Cholesterol)");
+            cv.put(COL_UNIT, "mg/dL");
             cv.put(COL_MIN_VALUE, 150);
             cv.put(COL_MAX_VALUE, 200);
             cv.put(COL_CATEGORY, HEALTH_RECORD_CATEGORY_FAT_GLUCOSE);
@@ -934,6 +942,7 @@ public class CareDb {
 
             cv = new ContentValues();
             cv.put(COL_TITLE, "อัตราส่วนโคเลสเตอรอลกับไขมันความหนาแน่นสูง (HDL)");
+            cv.put(COL_UNIT, "mg/dL");
             cv.put(COL_MIN_VALUE, 40);
             cv.put(COL_MAX_VALUE, 999);
             cv.put(COL_CATEGORY, HEALTH_RECORD_CATEGORY_FAT_GLUCOSE);
@@ -941,6 +950,7 @@ public class CareDb {
 
             cv = new ContentValues();
             cv.put(COL_TITLE, "ระดับไขมันความหนาแน่นต่ำ (LDL)");
+            cv.put(COL_UNIT, "mg/dL");
             cv.put(COL_MIN_VALUE, 0);
             cv.put(COL_MAX_VALUE, 150);
             cv.put(COL_CATEGORY, HEALTH_RECORD_CATEGORY_FAT_GLUCOSE);
@@ -969,6 +979,7 @@ public class CareDb {
 
             cv = new ContentValues();
             cv.put(COL_TITLE, "ไตรกลีเซอไรด์ (Triglycerides)");
+            cv.put(COL_UNIT, "mg/dL");
             cv.put(COL_MIN_VALUE, 10);
             cv.put(COL_MAX_VALUE, 190);
             cv.put(COL_CATEGORY, HEALTH_RECORD_CATEGORY_SYSTEM);

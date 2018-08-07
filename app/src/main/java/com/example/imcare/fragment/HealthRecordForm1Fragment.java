@@ -81,7 +81,7 @@ public class HealthRecordForm1Fragment extends BaseFragment implements View.OnCl
         String month = monthFormatter.format(date);
 
         SimpleDateFormat yearFormatter = new SimpleDateFormat("yyyy", Locale.US);
-        String yearInBe = String.valueOf(Integer.valueOf(yearFormatter.format(date)) + 543);
+        String yearInBe = String.valueOf(Integer.valueOf(yearFormatter.format(date)));
 
         SimpleDateFormat dayFormatter = new SimpleDateFormat("dd", Locale.US);
         String day = dayFormatter.format(date);

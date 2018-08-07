@@ -58,7 +58,7 @@ public class HealthRecordFormFragment extends BaseFragment implements View.OnCli
         ImageView dateIconImageView = view.findViewById(R.id.date_icon_image_view);
         dateIconImageView.setOnClickListener(this);
 
-        final RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+        final RecyclerView recyclerView = view.findViewById(R.id.record_item_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mAdapter = new HealthRecordListAdapter(
                 getContext(),

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragment.ProfileHealthRecordFragment">
+
+    <TextView
+        android:id="@+id/date_label_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="32dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:text="วันที่ตรวจสุขภาพ"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/age_label_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="อายุ"
+        app:layout_constraintStart_toStartOf="@+id/date_label_text_view"
+        app:layout_constraintTop_toBottomOf="@+id/date_label_text_view" />
+
+    <TextView
+        android:id="@+id/place_label_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="สถานที่ตรวจ"
+        app:layout_constraintStart_toStartOf="@+id/age_label_text_view"
+        app:layout_constraintTop_toBottomOf="@+id/age_label_text_view" />
+
+    <TextView
+        android:id="@+id/doctor_label_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="แพทย์ที่ตรวจ"
+        app:layout_constraintStart_toStartOf="@+id/place_label_text_view"
+        app:layout_constraintTop_toBottomOf="@+id/place_label_text_view" />
+
+    <TextView
+        android:id="@+id/date_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        android:layout_marginRight="32dp"
+        app:layout_constraintBottom_toBottomOf="@+id/date_label_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/date_label_text_view"
+        app:layout_constraintVertical_bias="0.0"
+        tools:text="01 / 06 / 2018" />
+
+    <TextView
+        android:id="@+id/year_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="22dp"
+        android:text="ปี"
+        app:layout_constraintBottom_toBottomOf="@+id/age_text_view"
+        app:layout_constraintEnd_toEndOf="@+id/date_text_view"
+        app:layout_constraintTop_toTopOf="@+id/age_text_view" />
+
+    <TextView
+        android:id="@+id/age_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/age_label_text_view"
+        app:layout_constraintEnd_toStartOf="@+id/year_text_view"
+        app:layout_constraintTop_toTopOf="@+id/age_label_text_view"
+        app:layout_constraintVertical_bias="0.0"
+        tools:text="55" />
+
+    <TextView
+        android:id="@+id/place_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/place_label_text_view"
+        app:layout_constraintEnd_toEndOf="@+id/date_text_view"
+        app:layout_constraintTop_toTopOf="@+id/place_label_text_view"
+        tools:text="รพ.รามาธิบดี" />
+
+    <TextView
+        android:id="@+id/doctor_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/doctor_label_text_view"
+        app:layout_constraintEnd_toEndOf="@+id/place_text_view"
+        app:layout_constraintTop_toTopOf="@+id/doctor_label_text_view"
+        tools:text="นพ.รามา ธิบดี" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/record_item_recycler_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/doctor_label_text_view" />
+
+</android.support.constraint.ConstraintLayout>

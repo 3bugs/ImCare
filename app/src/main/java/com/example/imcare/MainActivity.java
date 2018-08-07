@@ -24,6 +24,7 @@ import com.example.imcare.fragment.HealthRecordGraphFragment;
 import com.example.imcare.fragment.HealthRecordListFragment;
 import com.example.imcare.fragment.HealthRecordMainFragment;
 import com.example.imcare.fragment.ProfileDataFragment;
+import com.example.imcare.fragment.ProfileHealthRecordFragment;
 import com.example.imcare.model.HealthRecord;
 import com.example.imcare.model.Profile;
 
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements
         HealthRecordForm2Fragment.HealthRecordForm2FragmentListener,
         HealthRecordFormFragment.HealthRecordFormListener,
         ProfileDataFragment.ProfileDataFragmentListener,
+        ProfileHealthRecordFragment.ProfileHealthRecordFragmentListener,
         HealthRecordGraphFragment.HealthRecordGraphFragmentListener,
         HealthRecordListFragment.HealthRecordListFragmentListener {
 
@@ -76,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements
         loadTopFragment(HEALTH_RECORD);
 
         CareDb careDb = new CareDb(this);
-        String dateString = new MyDateFormatter().format(careDb.getProfile().birthDate);
+        String dateString = new MyDateFormatter().formatDb(careDb.getProfile().birthDate);
         int sex = careDb.getProfile().sex;
         String msg = String.format(
                 Locale.getDefault(),
@@ -278,12 +280,15 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onHealthRecordItemClick(HealthRecord healthRecord, int which) {
+        BaseFragment fragment;
         switch (which) {
             case 1:
-                HealthRecordGraphFragment fragment = HealthRecordGraphFragment.newInstance(healthRecord);
+                fragment = HealthRecordGraphFragment.newInstance(healthRecord);
                 loadFragment(fragment);
                 break;
             case 2:
+                fragment = ProfileHealthRecordFragment.newInstance(healthRecord);
+                loadFragment(fragment);
                 break;
         }
     }

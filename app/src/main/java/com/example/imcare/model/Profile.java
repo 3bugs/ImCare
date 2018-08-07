@@ -20,6 +20,10 @@ public class Profile {
         return getDiffYears(birthDate, new Date());
     }
 
+    public int getAge(Date date) {
+        return getDiffYears(birthDate, date);
+    }
+
     private int getDiffYears(Date first, Date last) {
         Calendar a = Calendar.getInstance();
         a.setTime(first);
