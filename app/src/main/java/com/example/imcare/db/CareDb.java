@@ -11,13 +11,16 @@ import android.util.Log;
 import com.example.imcare.etc.MyDateFormatter;
 import com.example.imcare.model.HealthRecord;
 import com.example.imcare.model.HealthRecordItem;
+import com.example.imcare.model.HealthRecordLookup;
 import com.example.imcare.model.Profile;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import static com.example.imcare.etc.Const.HEALTH_RECORD_CATEGORY_BODY;
 import static com.example.imcare.etc.Const.HEALTH_RECORD_CATEGORY_FAT_GLUCOSE;
@@ -33,7 +36,7 @@ public class CareDb {
     public static final String STORED_DATE_FORMAT = "yyyy-MM-dd";
 
     private static final String DATABASE_NAME = "care.db";
-    private static final int DATABASE_VERSION = 15;
+    private static final int DATABASE_VERSION = 16;
 
     // เทเบิล checkup_guide
     // +-----+-------+-----+---------+---------+
@@ -211,6 +214,34 @@ public class CareDb {
         return checkupList;
     }
 
+    public List<HealthRecordLookup> getHealthRecordLookup() {
+        List<HealthRecordLookup> healthRecordLookupList = new ArrayList<>();
+
+        Cursor cursor = mDatabase.query(
+                TABLE_HEALTH_RECORD_LOOKUP,
+                null,
+                null,
+                null,
+                null,
+                null,
+                COL_ID
+        );
+        while (cursor.moveToNext()) {
+            long id = cursor.getLong(cursor.getColumnIndex(COL_ID));
+            String title = cursor.getString(cursor.getColumnIndex(COL_TITLE));
+            String name = cursor.getString(cursor.getColumnIndex(COL_NAME));
+            float minValue = cursor.getFloat(cursor.getColumnIndex(COL_MIN_VALUE));
+            float maxValue = cursor.getFloat(cursor.getColumnIndex(COL_MAX_VALUE));
+            int category = cursor.getInt(cursor.getColumnIndex(COL_CATEGORY));
+
+            healthRecordLookupList.add(
+                    new HealthRecordLookup(id, title, name, minValue, maxValue, category)
+            );
+        }
+        cursor.close();
+        return healthRecordLookupList;
+    }
+
     public List<HealthRecord> getHealthRecord() {
         List<HealthRecord> healthRecordList = new ArrayList<>();
 
@@ -224,7 +255,7 @@ public class CareDb {
                 COL_DATE
         );
         while (cursor.moveToNext()) {
-            int id = cursor.getInt(cursor.getColumnIndex(COL_ID));
+            long id = cursor.getLong(cursor.getColumnIndex(COL_ID));
             String dateString = cursor.getString(cursor.getColumnIndex(COL_DATE));
             String place = cursor.getString(cursor.getColumnIndex(COL_PLACE));
             String doctor = cursor.getString(cursor.getColumnIndex(COL_DOCTOR));
@@ -237,19 +268,26 @@ public class CareDb {
         return healthRecordList;
     }
 
-    public void getHealthRecordItemByLookup(int lookupId) {
+    public List<Map<String, Object>> getHealthRecordItemByLookup(int lookupId) {
         String sql = "SELECT hr.date AS date, hrd.value AS value "
                 + " FROM health_record hr INNER JOIN health_record_details hrd ON hr._id = hrd.record_id "
                 + " WHERE hrd.lookup_id = ? ";
         Cursor cursor = mDatabase.rawQuery(sql, new String[]{String.valueOf(lookupId)});
 
+        ArrayList<Map<String, Object>> list = new ArrayList<>();
+
         while (cursor.moveToNext()) {
             String date = cursor.getString(cursor.getColumnIndex("date"));
             float value = cursor.getFloat(cursor.getColumnIndex("value"));
-            Log.i(TAG, String.format(Locale.getDefault(), "Date: %s, Value: %.1f", date, value));
+
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("date", date);
+            map.put("value", value);
+            list.add(map);
         }
 
         cursor.close();
+        return list;
     }
 
     public List<HealthRecordItem> getHealthRecordItemListByDateAndCategory(Date date, int category) {
@@ -902,6 +940,7 @@ public class CareDb {
 
             cv = new ContentValues();
             cv.put(COL_TITLE, "ความดันโลหิต (BP) ค่าบน");
+            cv.put(COL_NAME, "blood_pressure_top");
             cv.put(COL_UNIT, "mm Hg");
             cv.put(COL_MIN_VALUE, 120);
             cv.put(COL_MAX_VALUE, 129);
@@ -910,6 +949,7 @@ public class CareDb {
 
             cv = new ContentValues();
             cv.put(COL_TITLE, "ความดันโลหิต (BP) ค่าล่าง");
+            cv.put(COL_NAME, "blood_pressure_bottom");
             cv.put(COL_UNIT, "mm Hg");
             cv.put(COL_MIN_VALUE, 80);
             cv.put(COL_MAX_VALUE, 84);
@@ -927,6 +967,7 @@ public class CareDb {
 
             cv = new ContentValues();
             cv.put(COL_TITLE, "Hemoglobin (Hb/HGB)");
+            cv.put(COL_NAME, "hemoglobin");
             cv.put(COL_MIN_VALUE, 13.5);
             cv.put(COL_MAX_VALUE, 17.5);
             cv.put(COL_CATEGORY, HEALTH_RECORD_CATEGORY_HEART_BLOOD);
@@ -934,6 +975,7 @@ public class CareDb {
 
             cv = new ContentValues();
             cv.put(COL_TITLE, "Hematocrit (Hct)");
+            cv.put(COL_NAME, "hematocrit");
             cv.put(COL_MIN_VALUE, 40);
             cv.put(COL_MAX_VALUE, 50);
             cv.put(COL_CATEGORY, HEALTH_RECORD_CATEGORY_HEART_BLOOD);
@@ -941,6 +983,7 @@ public class CareDb {
 
             cv = new ContentValues();
             cv.put(COL_TITLE, "ระดับน้ำตาลในเลือด (FPG)");
+            cv.put(COL_NAME, "sugar");
             cv.put(COL_UNIT, "mg/dL");
             cv.put(COL_MIN_VALUE, 82);
             cv.put(COL_MAX_VALUE, 110);
@@ -949,6 +992,7 @@ public class CareDb {
 
             cv = new ContentValues();
             cv.put(COL_TITLE, "ไขมันในเลือด (Cholesterol)");
+            cv.put(COL_NAME, "cholesterol");
             cv.put(COL_UNIT, "mg/dL");
             cv.put(COL_MIN_VALUE, 150);
             cv.put(COL_MAX_VALUE, 200);
@@ -957,6 +1001,7 @@ public class CareDb {
 
             cv = new ContentValues();
             cv.put(COL_TITLE, "อัตราส่วนโคเลสเตอรอลกับไขมันความหนาแน่นสูง (HDL)");
+            cv.put(COL_NAME, "hdl");
             cv.put(COL_UNIT, "mg/dL");
             cv.put(COL_MIN_VALUE, 40);
             cv.put(COL_MAX_VALUE, 999);
@@ -965,6 +1010,7 @@ public class CareDb {
 
             cv = new ContentValues();
             cv.put(COL_TITLE, "ระดับไขมันความหนาแน่นต่ำ (LDL)");
+            cv.put(COL_NAME, "ldl");
             cv.put(COL_UNIT, "mg/dL");
             cv.put(COL_MIN_VALUE, 0);
             cv.put(COL_MAX_VALUE, 150);
@@ -973,6 +1019,7 @@ public class CareDb {
 
             cv = new ContentValues();
             cv.put(COL_TITLE, "การตรวจหาโรคเกาต์ (กรดยูริก Uric Acid )");
+            cv.put(COL_NAME, "uric_acid");
             cv.put(COL_MIN_VALUE, 3);
             cv.put(COL_MAX_VALUE, 8);
             cv.put(COL_CATEGORY, HEALTH_RECORD_CATEGORY_SYSTEM);
@@ -980,6 +1027,7 @@ public class CareDb {
 
             cv = new ContentValues();
             cv.put(COL_TITLE, "ระดับเอนไซม์จากตับ SGOT (AST)");
+            cv.put(COL_NAME, "sgot");
             cv.put(COL_MIN_VALUE, 0);
             cv.put(COL_MAX_VALUE, 40);
             cv.put(COL_CATEGORY, HEALTH_RECORD_CATEGORY_SYSTEM);
@@ -987,6 +1035,7 @@ public class CareDb {
 
             cv = new ContentValues();
             cv.put(COL_TITLE, "ระดับการทำงานของต่อมไทรอยด์");
+            cv.put(COL_NAME, "thyroid");
             cv.put(COL_MIN_VALUE, 0.5);
             cv.put(COL_MAX_VALUE, 5);
             cv.put(COL_CATEGORY, HEALTH_RECORD_CATEGORY_SYSTEM);
@@ -994,6 +1043,7 @@ public class CareDb {
 
             cv = new ContentValues();
             cv.put(COL_TITLE, "ไตรกลีเซอไรด์ (Triglycerides)");
+            cv.put(COL_NAME, "triglycerides");
             cv.put(COL_UNIT, "mg/dL");
             cv.put(COL_MIN_VALUE, 10);
             cv.put(COL_MAX_VALUE, 190);

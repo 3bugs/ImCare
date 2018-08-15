@@ -1,7 +1,6 @@
 package com.example.imcare.fragment;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,15 +10,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.imcare.R;
+import com.example.imcare.model.HealthRecordLookup;
 import com.github.mikephil.charting.charts.LineChart;
+import com.google.gson.Gson;
 
 public class GraphFragment extends Fragment {
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_HEALTH_RECORD_LOOKUP_JSON = "health_record_lookup_json";
 
-    private String mParam1;
-    private String mParam2;
+    private HealthRecordLookup mHealthRecordLookup;
 
     private GraphFragmentListener mListener;
 
@@ -27,11 +26,10 @@ public class GraphFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static GraphFragment newInstance(String param1, String param2) {
+    public static GraphFragment newInstance(HealthRecordLookup healthRecordLookup) {
         GraphFragment fragment = new GraphFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString(ARG_HEALTH_RECORD_LOOKUP_JSON, new Gson().toJson(healthRecordLookup));
         fragment.setArguments(args);
         return fragment;
     }
@@ -40,8 +38,8 @@ public class GraphFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            String healthRecordLookupJson = getArguments().getString(ARG_HEALTH_RECORD_LOOKUP_JSON);
+            mHealthRecordLookup = new Gson().fromJson(healthRecordLookupJson, HealthRecordLookup.class);
         }
     }
 

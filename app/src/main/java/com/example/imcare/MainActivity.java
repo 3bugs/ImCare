@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -17,6 +18,8 @@ import com.example.imcare.fragment.BaseFragment;
 import com.example.imcare.fragment.CheckupGuideFormFragment;
 import com.example.imcare.fragment.CheckupGuideMainFragment;
 import com.example.imcare.fragment.CheckupGuideResultFragment;
+import com.example.imcare.fragment.GraphFragment;
+import com.example.imcare.fragment.GraphPagerFragment;
 import com.example.imcare.fragment.HealthRecordForm1Fragment;
 import com.example.imcare.fragment.HealthRecordForm2Fragment;
 import com.example.imcare.fragment.HealthRecordFormFragment;
@@ -30,7 +33,9 @@ import com.example.imcare.model.Profile;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import static com.example.imcare.etc.Const.CHECKUP_GUIDE;
 import static com.example.imcare.etc.Const.HEALTH_RECORD;
@@ -51,7 +56,9 @@ public class MainActivity extends AppCompatActivity implements
         ProfileDataFragment.ProfileDataFragmentListener,
         ProfileHealthRecordFragment.ProfileHealthRecordFragmentListener,
         HealthRecordGraphFragment.HealthRecordGraphFragmentListener,
-        HealthRecordListFragment.HealthRecordListFragmentListener {
+        HealthRecordListFragment.HealthRecordListFragmentListener,
+        GraphPagerFragment.GraphPagerFragmentListener,
+        GraphFragment.GraphFragmentListener {
 
     private static final String TAG = MainActivity.class.getName();
 
@@ -88,7 +95,12 @@ public class MainActivity extends AppCompatActivity implements
         );
         Utils.showLongToast(this, msg);
 
-        new CareDb(this).getHealthRecordItemByLookup(1);
+        List<Map<String, Object>> list = new CareDb(this).getHealthRecordItemByLookup(1);
+        for (Map<String, Object> map : list) {
+            String date = String.valueOf(map.get("date"));
+            float value = (float) map.get("value");
+            Log.i(TAG, String.format(Locale.getDefault(), "Date: %s, Value: %.1f", date, value));
+        }
     }
 
     private void setupToolbar() {
@@ -206,7 +218,8 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case 2:
                 //fragment = new HealthRecordGraphFragment();
-                fragment = HealthRecordListFragment.newInstance(1);
+                //fragment = HealthRecordListFragment.newInstance(1);
+                fragment = new GraphPagerFragment();
                 break;
         }
         loadFragment(fragment);
